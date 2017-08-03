@@ -125,8 +125,10 @@ $(document).ready(function () {
 
 <div id="introduction" class="section level1">
 <h1>Introduction</h1>
+<hr />
 <p>One of R’s strengths is the abundance of packages freely available to users (<a href="http://blog.revolutionanalytics.com/2017/01/cran-10000.html">over 10,000 as of 27/01/2017</a>). As such, everyone ultimately has their own suite of select packages that they use, and on a personal computer these are easily managed and stored within the user’s library. On a massive communal resource like The University of Melbourne’s Spartan high-performance computing (HPC) service things are not so simple. R is available as a module on Spartan that any user can load, however, it has a library linked to the module that non-admin users cannot modify. While the library is loaded with a suite of commonly used packages it is not exhaustive and many users will require additional packages. The system administrators can add additional packages (or update them to more recent versions) upon request, but the job gets added to a queue and could take days (or weeks) to be completed. Instead it is easier (for both users and administrators) if the users are able to install additional pacages themselves.</p>
 <p>R has the ability to connect to multiple libraries and search them all when trying to load packages. This is a fairly straight-forward process on a personal computer, but more complex to set-up on HPC architecture like Spartan where a user’s jobs could be run any on any of hundreds of different compute nodes with different environments. This guide will show you how to a) set-up a secondary, user-specific library on Spartan linked to your home directory, and b) install all of the packages already on your personal computer that <em>aren’t</em> in Spartan’s R library into this new user-specific library. This guide will make use of some specialised unix commands and SLURM scripts but does not require any previous knowledge of them from the user (the steps can be mostly followed by copy/pasting commands). <strong>[LINK TO SPARTAN INTRO GUIDE]</strong></p>
+<hr />
 </div>
 <div id="set-up-a-user-specific-library" class="section level1">
 <h1>Set-up a user-specific library</h1>
@@ -140,6 +142,7 @@ $(document).ready(function () {
 <p>To create a user-specific library on Spartan we just need to create a folder for it. This can be done interactively through your SFTP client (like WinSCP for Windows users, or CyberDuck for Mac users) using the new folder button, or using the <code>mkdir</code> command in Spartan’s command line. For example:</p>
 <pre class="r"><code>mkdir -p ~/R/lib</code></pre>
 <p>This creates the <code>lib</code> directory inside the <code>R</code> directory in your home directory (refered to by ~). The rest of this guide assumes you have created this same directory, but if you select something else you can just modify the commands/files that follow.</p>
+<hr />
 </div>
 <div id="set-spartan-to-always-connect-to-this-new-library" class="section level3">
 <h3>Set Spartan to always connect to this new library</h3>
@@ -186,15 +189,18 @@ export R_LIBS_USER=&quot;/usr/local/easybuild/software/R/3.4.0-GCC-4.9.2/lib64/R
 <p>And follow the prompts to exit and save (<code>^X</code> means <code>Control + X</code> or <code>Command + X</code>).</p>
 <p>Now each time we open a new environment on Spartan we export the <code>R_LIBS_USER</code> variable (which sets R’s library paths) into the new environment automatically. We can supply any number of library paths to this variable as long as they are each within <code>&quot; &quot;</code> and separated from each other by <code>:</code>. In this example we set two library paths: the default Spartan library (for the at-time-of-writing current version of R) and then our user-specific library.</p>
 <p>Changes to the <code>.bash_profile</code> file don’t take effect until our next log-in to Spartan, so if we log-out and back in again our changes come into effect and we are now free to install and load packages to/from our user-specific library.</p>
+<hr />
 </div>
 </div>
 <div id="install-your-personal-computers-r-packages-into-your-spartan-user-specific-library" class="section level1">
 <h1>Install your personal computer’s R packages into your Spartan user-specific library</h1>
 <p>Now that you have a user-specific library set-up we can start installing our R packages. We can take the cumbersome route of opening an <code>sinteractive</code> session and manually running an <code>install.packages()</code> command for each package we want to install (all while checking to see if it isn’t already instead in the Spartan library), or we can take the slightly more complex but vastly more efficient route of running a couple of script files to mostly automate the process.</p>
+<hr />
 <div id="create-a-list-of-packages-installed-on-your-personal-machine" class="section level3">
 <h3>Create a list of packages installed on your personal machine</h3>
 <p>The first step involves running the <code>installed_packages_local.R</code> script file (found in the <code>Scripts</code> directory in this repository) on your local machine. You will need to change the first line of code to set the working directory.</p>
 <p>This creates a file called <code>installed_packages_local.rda</code> in your working directory that contains a vector of names of the R packages installed on your local computer. You need to copy this file into your Spartan home directory. Assuming you have followed the naming convention of this guide this should be in the <code>~/R</code> directory (NOT <code>~/R/lib</code>) so that it is kept with the package library but not <em>in</em> the library.</p>
+<hr />
 </div>
 <div id="install-packages-into-your-user-specific-library" class="section level3">
 <h3>Install packages into your user-specific library</h3>
@@ -205,6 +211,7 @@ export R_LIBS_USER=&quot;/usr/local/easybuild/software/R/3.4.0-GCC-4.9.2/lib64/R
 <pre class="r"><code>sbatch ~/R/install_R_packages_spartan.slurm</code></pre>
 <p>You can check the status of the job using the following command:</p>
 <pre class="r"><code>squeue -u username  # replace username with your Spartan username</code></pre>
+<hr />
 </div>
 <div id="troubleshooting" class="section level3">
 <h3>Troubleshooting</h3>
@@ -224,6 +231,7 @@ install.packages(package.name,  # name of missing package
                  lib = &quot;~/R/lib/&quot;,  # the file path to your user-specific library
                  repos = &quot;https://cran.ms.unimelb.edu.au/&quot;)  # Need to specify a CRAN mirror </code></pre>
 <p>Packages that fail to install will generally give you an error message saying why. Sometimes the command justs needs to be run again because it failed to connect to a CRAN mirror, otherwise it should give you some information to say why it can’t install. Missing files/programs will tell you if there are extra modules you may need to load. If you still can’t install a package contact the Spartan admins at: <a href="hpc-support@unimelb.edu.au" class="uri">hpc-support@unimelb.edu.au</a>.</p>
+<hr />
 </div>
 </div>
 
